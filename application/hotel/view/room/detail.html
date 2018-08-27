@@ -1,0 +1,76 @@
+{extend name="base/base"}
+{block name="main"}
+<fieldset class="layui-elem-field">
+    <legend>房间信息</legend>
+    <div class="layui-field-box">
+        <table class="layui-table">
+            <tbody>
+            <tr>
+                <th>房间相册</th>
+                <td>
+                    {volist name="room.image" id="item"}
+                    <img src="{$item.url}" width="50px">
+                    {/volist}
+                </td>
+            </tr>
+            <tr>
+                <th>房间类型</th>
+                <td>{$room.room_type}</td>
+            </tr>
+            <tr>
+                <th>价格</th>
+                <td>{$room.price}</td>
+            </tr>
+            <tr>
+                <th>可否拼团</th>
+                <td>{$room.is_group?'可拼团':'不可拼团'}</td>
+            </tr>
+            <tr>
+                <th>拼团价格</th>
+                <td>
+                    {$room.group_price}
+                </td>
+            </tr>
+            <tr>
+                <th>房间数量</th>
+                <td>{$room.stock}</td>
+            </tr>
+            <tr>
+                <th>房间设施</th>
+                <td>
+                    {volist name="$room.facility" id="item"}
+                    {$item.parentCate.name}:{$item.name}|
+                    {/volist}
+                </td>
+            </tr>
+            <tr>
+                <th>备注</th>
+                <td>{$room.room_remark}</td>
+            </tr>
+            <tr>
+                <th>退款规则</th>
+                <td>{$room.refund_rule}</td>
+            </tr>
+            <tr>
+                <th>使用规则</th>
+                <td>{$room.regulation}</td>
+            </tr>
+        </table>
+    </div>
+</fieldset>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['layer', 'table', 'laydate', 'form'], function () {
+        var layer = layui.layer, table = layui.table, $ = layui.jquery, laydate = layui.laydate, form = layui.form;
+        $("#edit").on('click', function () {
+            layer.open({
+                type: 2,
+                content: ['{:url("edit")}'],
+                area: ['800px', '700px'],
+                title: '编辑酒店基本信息'
+            });
+        })
+    });
+</script>
+{/block}

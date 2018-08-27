@@ -1,0 +1,57 @@
+{extend name="base/base"}
+{block name="main"}
+<blockquote class="layui-elem-quote">
+    <span style="vertical-align: inherit;">欢迎管理员：</span>
+    <span class="x-red">{:session('admin.account')}</span>
+    <span style="vertical-align: inherit;">！当前时间：{:date('Y-m-d H:i:s')}</span>
+</blockquote>
+
+<fieldset class="layui-elem-field">
+    <legend>类别属性信息</legend>
+    <div class="layui-field-box">
+        <button class="layui-btn" id="edit">
+            编辑
+        </button>
+        <table class="layui-table">
+            <thead>
+                <tr>
+                    <th>类别</th>
+                    <th>属性</th>
+                </tr>
+            </thead>
+            <tbody>
+                {volist name="category" id="item"}
+                <tr>
+                    <td>{$item.parent_cate.name}</td>
+                    <td>{$item.name}</td>
+                </tr>
+
+                {/volist}
+            </tbody>
+        </table>
+    </div>
+</fieldset>
+{/block}
+{block name="javascript"}
+<script>
+    layui.use(['layer', 'table', 'laydate', 'form'], function() {
+        var layer = layui.layer, table = layui.table, $ = layui.jquery, laydate = layui.laydate, form = layui.form;
+
+        $("#edit").on('click', function () {
+            //iframe层-父子操作
+            var index = layer.open({
+                type: 2,
+                title: '编辑类别',
+                area: ['600px', '400px'],
+                maxmin: true,
+                fixed: false, //不固定
+                content: '{:url("edit")}',
+                end: function () {
+                    location.reload();
+                }
+            });
+            layer.full(index);
+        })
+    });
+</script>
+{/block}

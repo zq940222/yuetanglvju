@@ -1,0 +1,120 @@
+{extend name="base/base"}
+{block name="main"}
+<blockquote class="layui-elem-quote">
+    <span style="font-size:18px;">运费模板</span>
+</blockquote>
+<a class="layui-btn" href="{:url('info')}">
+    <i class="layui-icon">&#xe608;</i> 添加
+</a>
+{volist name="template_list" id="template"}
+<fieldset class="layui-elem-field">
+    <legend>{$template.template_name}</legend>
+    <div class="layui-field-box">
+        <a class="layui-btn layui-btn-primary layui-btn-xs" href="{:url('edit',['template_id'=>$template.id])}">
+            <i class="layui-icon">&#xe642;</i>
+        </a>
+        <button class="layui-btn layui-btn-primary layui-btn-xs del" data-id="{$template.id}">
+            <i class="layui-icon">&#xe640;</i>
+        </button>
+        <table class="layui-table">
+            <thead>
+            <tr>
+                <th>配送区域</th>
+                <th>首件数(件)</th>
+                <th>运费(元)</th>
+                <th>续件数(件)</th>
+                <th>运费(元)</th>
+            </tr>
+            </thead>
+            <tbody>
+            {volist name="template.freightConfig" id="config"}
+            <tr>
+                <td>
+                    {if condition="$config.is_default eq 1"}
+                        中国
+                    {else/}
+                        {volist name="config.freightRegion" id="freight_region"}
+                            {$freight_region.region.name},
+                        {/volist}
+                    {/if}
+                </td>
+                <td>
+                    {$config.first_unit}
+                </td>
+                <td>
+                    {$config.first_money}
+                </td>
+                <td>
+                    {$config.continue_unit}
+                </td>
+                <td>
+                    {$config.continue_money}
+                </td>
+            </tr>
+            {/volist}
+            </tbody>
+        </table>
+    </div>
+</fieldset>
+{/volist}
+{/block}
+{block name="javascript"}
+<script>
+    layui.use(['layer', 'table', 'laydate', 'form'], function() {
+        var layer = layui.layer, table = layui.table, $ = layui.jquery, laydate = layui.laydate, form = layui.form;
+        //删除运费确定事件
+        $(".del").on('click',function () {
+            var template_id = $(this).data('id');
+            layer.confirm('确认删除？', {
+                    btn: ['确定', '取消'] //按钮
+                }, function () {
+                    $.ajax({
+                        type: 'post',
+                        url: "{:url('delete')}",
+                        data: {template_id: template_id},
+                        dataType: 'json',
+                        success: function (data) {
+                            layer.closeAll();
+                            if (data.status == 1) {
+                                layer.msg(data.msg, {icon: 1, time: 2000}, function () {
+                                    window.location.reload();
+                                });
+                            } else if (data.status == -1) {
+                                layer.confirm(data.msg, {
+                                        btn: ['确定', '取消'] //按钮
+                                    }, function () {
+                                        $.ajax({
+                                            type: 'post',
+                                            url: "{:url('delete')}",
+                                            data: {template_id: template_id, action: 'confirm'},
+                                            dataType: 'json',
+                                            success: function (data) {
+                                                layer.closeAll();
+                                                if (data.status == 1) {
+                                                    layer.msg(data.msg, {icon: 1, time: 2000}, function () {
+                                                        window.location.reload();
+                                                    });
+                                                } else if (data.status == -1) {
+                                                    layer.msg(data.msg, {icon: 2, time: 2000});
+                                                } else {
+                                                    layer.msg(data.msg, {icon: 2, time: 2000});
+                                                }
+                                            }
+                                        })
+                                    }, function (index) {
+                                        layer.close(index);
+                                    }
+                                );
+                            } else {
+                                layer.msg(data.msg, {icon: 2, time: 2000});
+                            }
+                        }
+                    })
+                }, function (index) {
+                    layer.close(index);
+                }
+            );
+        })
+    })
+</script>
+{/block}

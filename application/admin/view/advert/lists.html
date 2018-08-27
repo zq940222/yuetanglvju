@@ -1,0 +1,122 @@
+{extend name="base/base"}
+{block name="main"}
+<blockquote class="layui-elem-quote">
+    <i class="layui-icon" style="font-size: 24px;">&#xe62d;</i>
+    <span style="font-size:18px;">广告列表</span>
+</blockquote>
+<button class="layui-btn layui-btn-danger" id="del-all">
+    批量删除
+</button>
+<button class="layui-btn" id="add">
+    <i class="layui-icon">&#xe608;</i> 添加
+</button>
+<table class="layui-table" lay-data="{id:'list', height:360, url:'{:url('page')}', page: true}" lay-filter="list">
+    <thead>
+    <tr>
+        <th lay-data="{field:'id', width:80, fixed:true, unresize: true, sort: true}">序号</th>
+        <th lay-data="{checkbox:true}"></th>
+        <th lay-data="{field:'banner_name'}">广告位</th>
+        <th lay-data="{field:'path', templet:'#path'}">图片</th>
+        <th lay-data="{field:'href'}">链接</th>
+        <th lay-data="{fixed:'right', toolbar: '#action'}">操作</th>
+    </tr>
+    </thead>
+</table>
+<div class="layui-hide" id="action">
+    <a class="layui-btn layui-btn-sm" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">删除</a>
+</div>
+<script type="text/html" id="path">
+    <img src="{{ d.image.url }}" width="80">
+</script>
+{/block}
+{block name="javascript"}
+<script>
+
+    layui.use(['layer', 'table', 'form'], function(){
+        var layer = layui.layer, table = layui.table, $ = layui.jquery;
+        //监听工具条
+        table.on('tool(list)', function(obj){
+            if(obj.event === 'edit'){
+                layer.open({
+                    type: 2,
+                    title:'编辑广告',
+                    area: ['600px', '400px'],
+                    maxmin: true,
+                    fixed: false, //不固定
+                    content: '{:url("edit")}?id='+obj.data.id,
+                    end: function () {
+                        location.reload();
+                    }
+                });
+            }else if (obj.event === 'del'){
+                layer.msg('你确定删除么？', {
+                    time: 0 //不自动关闭
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index){
+                        $.post('{:url("delete")}', {id:obj.data.id}, function(data) {
+                            var code = data.code.toString();
+                            var startChar = code.charAt(0);
+                            if (startChar == '2')
+                            {
+                                obj.del();
+                                layer.close(index);
+                                layer.alert(data.msg, {icon: 6});
+                            }else{
+                                layer.alert(data.msg, {icon: 7});
+                            }
+
+                        });
+
+                    }
+                });
+            }
+        });
+        //添加
+        $("#add").on('click',function () {
+            //iframe层-父子操作
+            layer.open({
+                type: 2,
+                title:'添加广告',
+                area: ['600px', '400px'],
+                maxmin: true,
+                fixed: false, //不固定
+                content: '{:url("add")}',
+                end: function () {
+                    location.reload();
+                }
+            });
+        })
+        //批量删除
+        $("#del-all").on('click',function () {
+            var checkStatus=table.checkStatus('list');
+            var delList = [];
+            checkStatus.data.forEach(function(n,i){
+                delList.push(n.id);
+            });
+            if(delList == ''){
+                layer.msg("请选择需要删除的选项");
+                return ;
+            }
+            layer.msg('你确定删除么？', {
+                time: 0 //不自动关闭
+                ,btn: ['确定', '取消']
+                ,yes: function(index){
+                    $.post('{:url("delete")}', {id:delList}, function(data) {
+                        var code = data.code.toString();
+                        var startChar = code.charAt(0);
+                        if (startChar == '2')
+                        {
+                            table.reload('list',{});
+                            layer.alert(data.msg, {icon: 6});
+                        }else{
+                            layer.alert(data.msg, {icon: 7});
+                        }
+                    });
+
+                }
+            });
+        })
+    });
+</script>
+{/block}

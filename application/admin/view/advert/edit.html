@@ -1,0 +1,114 @@
+{extend name="base/base"}
+{block name="main"}
+<div class="layui-anim layui-anim-up layui-field-box">
+    <form class="layui-form layui-form-pane" action="" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$data.id}">
+        <div class="layui-form-item">
+            <label class="layui-form-label">广告图片</label>
+            <div class="layui-upload">
+                <button type="button" class="layui-btn" id="file">上传图片</button>
+                <div class="layui-upload-list" style="padding-left:110px;">
+                    <img class="layui-upload-img" src="{$data.image.url}" id="showImg" width="80">
+                    <input type="hidden" name="image" id="path">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">广告链接</label>
+            <div class="layui-input-inline">
+                <input type="text" name="href" lay-verify="required"  placeholder="请输入广告链接" class="layui-input" value="{$data.href}">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">所属广告位</label>
+            <div class="layui-input-inline">
+                <select name="banner_id" lay-verify="banner">
+                    <option value="0">请选择广告位</option>
+                    {volist name="banner" id="item"}
+                    <option value="{$item.id}" {if condition="$item.id==$data.banner_id"}selected{/if}>{$item.name}</option>
+                    {/volist}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">关键字</label>
+            <div class="layui-input-inline">
+                <input type="text" name="key_word"  placeholder="请输入广告关键字" class="layui-input" value="{$data.key_word}">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="*">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+{/block}
+{block name="javascript"}
+<script>
+    layui.use(['form', 'upload'], function(){
+        var form = layui.form, upload=layui.upload, $=layui.jquery;
+        //监听提交
+        form.on('submit(*)', function(data){
+            $.ajax({
+                url:'edit',
+                type:'post',
+                data:data.field,
+                success:function (data) {
+                    var code = data.code.toString();
+                    var startChar = code.charAt(0);
+                    if (startChar == '2')
+                    {
+                        layer.alert(data.msg, {icon: 6},function () {
+                            // 获得frame索引
+                            var index = parent.layer.getFrameIndex(window.name);
+                            //关闭当前frame
+                            parent.layer.close(index);
+                        });
+                    }else{
+                        layer.alert(data.msg, {icon: 7});
+                    }
+                },
+                error:function (error) {
+                    layer.msg(error.responseJSON.msg);
+                }
+            })
+            return false;
+        });
+        upload.render({
+            elem: '#file'
+            ,url: '{:url("upload/upload")}'
+            ,size: 6000 //限制文件大小，单位 KB
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    console.log(result);
+                    $('#showImg').attr('src', result); //图片链接（base64）
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败');
+                }
+                //上传成功
+                $('#path').val(res.data.src); // 将上传后的图片路径赋值给隐藏域
+            }
+        });
+
+        form.verify({
+            banner:function(value, item) {
+                if(value==0) {
+                    return '请选择广告位';
+                }
+            }
+        })
+    });
+
+</script>
+{/block}

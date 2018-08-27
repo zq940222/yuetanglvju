@@ -1,0 +1,93 @@
+<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:73:"F:\programs\yuetanglvju\public/../application/admin\view\login\index.html";i:1533713524;}*/ ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>悦棠旅居</title>
+    <link rel="stylesheet" href="/static/css/layui.css" media="all" />
+    <link rel="stylesheet" href="/static/css/login.css" />
+</head>
+
+<body class="beg-login-bg" style="background-image: url('/static/images/banner_2.jpg')">
+<div class="beg-login-box">
+    <header>
+        <h1>悦棠旅居</h1>
+    </header>
+    <div class="beg-login-main">
+        <form action="login" class="layui-form" method="post">
+            <div class="layui-form-item">
+                <label class="beg-login-icon">
+                    <i class="layui-icon">&#xe612;</i>
+                </label>
+                <input type="text" name="username" lay-verify="username" autocomplete="off" placeholder="请输入登录名" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <label class="beg-login-icon">
+                    <i class="layui-icon">&#xe642;</i>
+                </label>
+                <input type="password" name="password" lay-verify="password" autocomplete="off" placeholder="请输入密码" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                    <button  class="layui-btn layui-btn-lg layui-btn-radius layui-btn-normal" style="width: 100%" lay-submit lay-filter="login">
+                        登录
+                    </button>
+                <div class="beg-clear"></div>
+            </div>
+        </form>
+    </div>
+    <footer>
+        <p>杭州牧马人提供技术支持 © www.hzmmr.com</p>
+    </footer>
+</div>
+<script type="text/javascript" src="/static/layui.js"></script>
+<script>
+    layui.use(['layer', 'form'], function() {
+        var layer = layui.layer,
+            $ = layui.jquery,
+            form = layui.form;
+        form.verify({
+            username: function(value, item){
+                if(!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)){
+                    return '用户名不能有特殊字符';
+                }
+                if(/(^\_)|(\__)|(\_+$)/.test(value)){
+                    return '用户名首尾不能出现下划线\'_\'';
+                }
+                if(/^\d+\d+\d$/.test(value)){
+                    return '用户名不能全为数字';
+                }
+            }
+            ,password: [/^[\S]{6,12}$/ ,'密码必须6到12位，且不能出现空格']
+        });
+        form.on('submit(login)', function(data){
+            var username = $(":text").val();
+            var password = $(':password').val();
+            $.ajax({
+                url: "<?php echo url('login/login'); ?>",
+                data: {username:username,password:password}, //请求的附加参数，用json对象
+                method: 'POST',
+                success: function (data) {
+                    var code = data.code.toString();
+                    var startChar = code.charAt(0);
+                    if (startChar == '2')
+                    {
+                        layer.alert(data.msg, {icon: 6},function () {
+                            window.location.href='<?php echo url("index/index"); ?>';
+                        });
+                    }else{
+                        layer.alert(data.msg, {icon: 7});
+                    }
+                },
+                error: function () {
+                    layer.msg("用户名或密码错误!", { icon: 5 });
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+
+</html>

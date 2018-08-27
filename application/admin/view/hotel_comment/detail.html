@@ -1,0 +1,59 @@
+{extend name="base/base"}
+{block name="main"}
+    <fieldset class="layui-elem-field">
+        <legend>评价信息</legend>
+        <div class="layui-field-box">
+            <table class="layui-table">
+                <tbody>
+                <tr>
+                    <th>酒店名称</th>
+                    <td>{$data.hotel.name}</td></tr>
+                <tr>
+                    <th>用户名</th>
+                    <td>{$data.user.nickname}</td></tr>
+                <tr>
+                    <th>评论内容</th>
+                    <td>{$data.content}</td></tr>
+                <tr>
+                    <th>评论图片</th>
+                    <td>
+                        {volist name="data.image" id="item"}
+                        <img src="{$item.url}" alt="">
+                        {/volist}
+                    </td></tr>
+                <tr>
+                    <th>总体评分</th>
+                    <td>{$data.overall_score}</td></tr>
+                <tr>
+                    <th>环境评分</th>
+                    <td>{$data.location_score}</td></tr>
+                <tr>
+                    <th>服务评分</th>
+                    <td>{$data.service_score}</td></tr>
+                <tr>
+                    <th>卫生评分</th>
+                    <td>{$data.sanitation_score}</td></tr>
+                <tr>
+                    <th>设施评分</th>
+                    <td>{$data.facility_score}</td></tr>
+                <tr>
+                    <th>入住时间</th>
+                    <td>{$data.check_in_time}</td></tr>
+                <tr>
+                    <th>房型</th>
+                    <td>{$data.room_type}</td></tr>
+                <tr>
+                    <th>创建时间</th>
+                    <td>{$data.create_time}</td></tr>
+            </table>
+        </div>
+    </fieldset>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['layer', 'table', 'laydate', 'form'], function(){
+        var layer = layui.layer, table = layui.table, $ = layui.jquery, laydate = layui.laydate, form = layui.form;
+
+    });
+</script>
+{/block}

@@ -1,0 +1,216 @@
+{extend name="base/base"}
+{block name="main"}
+<div class="layui-anim layui-anim-up layui-field-box">
+    <form class="layui-form" action="{:url('add')}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$room.id}">
+        <div class="layui-form-item">
+            <label class="layui-form-label">房间相册</label>
+            <div class="layui-input-block">
+                <div class="layui-upload">
+                    <button type="button" class="layui-btn" id="upload">多图片上传</button>
+                    <div class="layui-upload-list" id="showImg">
+                        {volist name="$room.image" id="item"}
+                        <img src="{$item.url}" alt="" width="100px">
+                        <button type="button" class="layui-btn layui-btn-sm layui-btn-radius layui-btn-danger del_img" data-id="{$item.id}">
+                            <i class="layui-icon">&#xe640;</i> 删除
+                        </button>
+                        <input type="hidden" name="image[]">
+                        {/volist}
+                    </div>
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <span style="color: red">*</span>至少有一张图片
+                </div>
+            </div>
+
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">房间类型</label>
+            <div class="layui-input-inline">
+                <select name="room_type" lay-verify="type">
+                    <option value="0">请选择一个房型</option>
+                    {volist name="room_type" id="item"}
+                    <option value="{$item.name}" {if condition="$item.name == $room.room_type"}selected{/if}>{$item.name}</option>
+                    {/volist}
+                </select>
+
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">价格</label>
+            <div class="layui-input-inline">
+                <input type="number" name="price" lay-verify="required" placeholder="请输入价格" class="layui-input" value="{$room.price}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">可否拼团</label>
+            <div class="layui-input-inline">
+                <input type="checkbox" name="is_group" lay-skin="switch" value="1" lay-text="是|否" lay-filter="is_group" {if condition="$room.is_group == 1"}checked{/if}>
+            </div>
+            <div class="layui-input-inline" id="group_price">
+                {notempty name="room.group_price"}
+                <input type="number" name="group_price" lay-verify="required" class="layui-input" placeholder="请输入拼团价格" value="{$room.group_price}">
+                {/notempty}
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">房间数量</label>
+            <div class="layui-input-inline">
+                <input type="number" name="stock" lay-verify="required|stock" placeholder="请输入房间数量" class="layui-input" value="{$room.stock}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">房间设施</label>
+            {volist name="facility" id="items"}
+            <div class="layui-input-block">
+                {$items.name}
+                {volist name="items.children" id="item"}
+                <input type="radio" name="{$items.name}" lay-verify="required" value="{$item.id}" title="{$item.name}" {if condition="in_array($item.id,$room_facility_ids)"}checked{/if}>
+                {/volist}
+            </div>
+            {/volist}
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">房间备注</label>
+            <div class="layui-input-block">
+                <input type="text" name="remark" lay-verify="required" placeholder="请输入房间备注" class="layui-input" value="{$room.room_remark}">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">退款规则</label>
+            <div class="layui-input-block">
+                <textarea name="refund_rule" required lay-verify="required" placeholder="请输入退款规则" class="layui-textarea">{$room.refund_rule}"</textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">使用规则</label>
+            <div class="layui-input-block">
+
+                <textarea id="regulation" style="display: none;" name="regulation">
+                    {$room.regulation}
+                </textarea>
+
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="*">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+{/block}
+{block name="javascript"}
+<script>
+
+    layui.use(['form','layedit','upload'], function () {
+        var form = layui.form, layedit = layui.layedit,upload = layui.upload, $ = layui.jquery;
+        $(".del_img").on('click',function () {
+            $this = $(this);
+            var id = $(this).attr('data-id');
+            $.ajax({
+                url:'del_img',
+                type:'post',
+                data:{id:id},
+                success:function (data) {
+                    if (data.errorCode == 0 ) {
+                        $this.prev('img').remove()
+                        $this.remove();
+                        layer.msg('已删除')
+                    }
+                }
+            })
+        })
+        upload.render({
+            elem: '#upload'
+            ,url: '{:url("upload/upload")}'
+            ,multiple: true
+            ,size: 1024
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#showImg').append('<img src="'+ result +'" alt="'+ file.name +'"  class="layui-upload-img" width="100px" style="margin-left:10px;">')
+                });
+            }
+            ,done: function(res){
+                //上传完毕
+                $('#showImg').append('<input type="hidden" name="image[]" value="'+res.data.src+'">');
+            }
+
+        });
+
+        form.on('switch(is_group)', function(data){
+            if (data.elem.checked) {
+                $("#group_price").append('<input type="number" name="group_price" lay-verify="required" class="layui-input" placeholder="请输入拼团价格">');
+                form.render();
+            }else{
+                $("#group_price").children().remove();
+            }
+        });
+
+        form.verify({
+            type:function (value,item) {
+                if (value == 0) {
+                    return '请选择房间类型';
+                }
+            },
+            stock:function (value,item) {
+                if (value < 1) {
+                    return '房间数量至少为1';
+                }
+            }
+        });
+        layedit.build('regulation',{
+            height: 180 //设置编辑器高度
+        });
+        //监听提交
+        form.on('submit(*)', function (data) {
+            //验证图片
+            var img = $("#showImg").children();
+            if(img.length == 0){
+                layer.msg('请添加至少一张图片');
+                return false;
+            }
+            var facility_id = [];
+            $('input[type="radio"]').each(function(i){
+                if($(this).is(":checked"))
+                {
+                    facility_id.push($(this).val())
+                }
+            });
+            var data = data.field;
+            data.facility_id = facility_id;
+            $.ajax({
+                url: 'edit',
+                type: 'post',
+                data: data,
+                success: function (data) {
+                    var code = data.code.toString();
+                    var startChar = code.charAt(0);
+                    if (startChar == '2')
+                    {
+                        layer.alert(data.msg, {icon: 6},function () {
+                            // 获得frame索引
+                            var index = parent.layer.getFrameIndex(window.name);
+                            //关闭当前frame
+                            parent.layer.close(index);
+                        });
+                    }else{
+                        layer.alert(data.msg, {icon: 7});
+                    }
+                },
+                error: function (error) {
+                    layer.msg(error.responseJSON.msg);
+                }
+            })
+            return false;
+        });
+    });
+</script>
+{/block}

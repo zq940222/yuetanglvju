@@ -1,0 +1,121 @@
+{extend name="base/base"}
+{block name="main"}
+
+<blockquote class="layui-elem-quote">
+    <i class="layui-icon" style="font-size: 24px;">&#xe62d;</i>
+    <span style="font-size:18px;">订单详情</span>
+    <a href="{:url('lists')}" class="layui-btn" style="float:right;margin-top:-5px">返回列表</a>
+</blockquote>
+<fieldset class="layui-elem-field">
+    <legend>订单详情</legend>
+    <div class="layui-field-box">
+        <table class="layui-table">
+            <tbody>
+            <tr>
+                <td style="width:120px;text-align:center; font-weight:bold" >订单号</td>
+                <td >{$order.order_no}</td>
+                <td style="width:120px;text-align:center; font-weight:bold">下单时间</td>
+                <td >{$order.create_time}</td>
+            </tr>
+            <tr>
+                <td style="width:120px;text-align:center; font-weight:bold">订单状态</td>
+                <td>{$order.status}</td>
+
+            </tr>
+            <tr>
+                <td style="width:120px;text-align:center; font-weight:bold">付款方式</td>
+                <td>{$order.pay_channel}</td>
+                <td style="width:120px;text-align:center; font-weight:bold">付款时间</td>
+                <td>{$order.pay_time}</td>
+            </tr>
+            <tr>
+                <td style="width:120px;text-align:center; font-weight:bold">收件人</td>
+                <td >{$order.consignee}</td>
+                <td style="width:120px;text-align:center; font-weight:bold">联系电话</td>
+                <td>{$order.mobile}</td>
+            </tr>
+            <tr>
+                <td style="width:120px;text-align:center; font-weight:bold">联系地址</td>
+                <td colspan="3">{$order->getRelation('province')->name}{$order->getRelation('city')->name}{$order->getRelation('district')->name}{$order.detail_address}</td>
+            </tr>
+            <tr>
+                <td style="width:120px;text-align:center; font-weight:bold">运费</td>
+                <td colspan="3">{$order.shipping_price}</td>
+            </tr>
+            <tr>
+                <td style="width:120px;text-align:center; font-weight:bold">商品列表</td>
+                <td colspan="3" style="padding:0px;">
+                    <table style="margin:0px;width:100%;">
+                        <tr>
+                            <td>商品ID</td>
+                            <td>商品名称</td>
+                            <td>商品图片</td>
+                            <td>商品价格</td>
+                            <td>购买数量</td>
+                            <td>总金额</td>
+                        </tr>
+                        {volist name="order.order_product" id="item"}
+                        <tr>
+                            <td>{$item.id}</td>
+                            <td>{$item.product_name}</td>
+                            <td></td>
+                            <td>{$item.product_price}</td>
+                            <td>{$item.product_num}</td>
+                            <td>{$item.product_price*$item.product_num}</td>
+                        </tr>
+                        {/volist}
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:120px;text-align:center; font-weight:bold">用户备注</td>
+                <td colspan="3">
+                    <textarea name="user_remark" disabled class="layui-input" style="width:100%; height:120px;">{$order.user_remark}</textarea>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" style="text-align:center">
+                    <form class="layui-form layui-form-pane" method="post" action="{:url('saveStatus')}">
+                        <input type="hidden" name="id" value="{$order.id}">
+                        <input type="radio" name="status" title="已发货" value="2" {if condition="$order->getData('status')==2"}checked{/if}>
+                        <input type="radio" name="status" title="已完成" value="4" {if condition="$order->getData('status')==4"}checked{/if}>
+                        <input type="radio" name="status" title="退货中" value="7" {if condition="$order->getData('status')==7"}checked{/if}>
+                        <input type="radio" name="status" title="已退货" value="8" {if condition="$order->getData('status')==8"}checked{/if}>
+                        <button class="layui-btn layui-btn-sm layui-btn-danger" style="width:100px"> 保 存 </button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</fieldset>
+{/block}
+{block name="javascript"}
+<script>
+    layui.use(['table', 'form', 'layer'], function(){
+        var  table = layui.table, $ = layui.jquery, form = layui.form, layer=layui.layer;
+
+        form.on('submit', function() {
+            var size=$(':radio[name^=status]:checked').size();
+            if(!size) {
+                return false; // 阻止表单发送
+            }
+        })
+
+
+        form.on('checkbox(shipping)', function(data) {
+            var $input = $(data.elem);
+            if($input.prop('checked')) {
+                layer.open({
+                    type: 2,
+                    content:['{:url("shipping", "id=".$order["id"])}'],
+                    area:['460px', '300px'],
+                    title:'发货信息'
+                });
+            } else {
+                $.post('{:url("shipping")}', {type:'clear', id:"{$order.id}"});
+            }
+        })
+    });
+</script>
+{/block}

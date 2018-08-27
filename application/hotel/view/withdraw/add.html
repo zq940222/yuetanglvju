@@ -1,0 +1,77 @@
+{extend name="base/base"}
+{block name="main"}
+<div class="layui-anim layui-anim-up layui-field-box">
+    <form class="layui-form layui-form-pane">
+        <div class="layui-form-item">
+            <label class="layui-form-label">提现金额：</label>
+            <div class="layui-input-inline">
+                <input type="text" name="money" lay-verify="required"  placeholder="最少提现额度10" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                最高可提现金额:{$can_withdraw}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">银行名称：</label>
+            <div class="layui-input-inline">
+                <input type="text" name="bank_name" lay-verify="required"  placeholder="如:支付宝等..." class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">收款账号：</label>
+            <div class="layui-input-inline">
+                <input type="text" name="bank_account_num" lay-verify="required"  placeholder="如:支付宝账号" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">开户名：</label>
+            <div class="layui-input-inline">
+                <input type="text" name="bank_account" lay-verify="required"  placeholder="开户人姓名" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="*">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+{/block}
+{block name="javascript"}
+<script>
+    layui.use(['form'], function(){
+        var form = layui.form, $ = layui.jquery;
+        //监听提交
+        form.on('submit(*)', function(data) {
+            $.ajax({
+                url:'add',
+                type:'post',
+                data:data.field,
+                success:function (data) {
+                    var code = data.code.toString();
+                    var startChar = code.charAt(0);
+                    if (startChar == '2')
+                    {
+                        layer.alert(data.msg, {icon: 6},function () {
+                            // 获得frame索引
+                            var index = parent.layer.getFrameIndex(window.name);
+                            //关闭当前frame
+                            parent.layer.close(index);
+                        });
+                    }else{
+                        layer.alert(data.msg, {icon: 7});
+                    }
+                },
+                error:function (error) {
+                    layer.msg(error.responseJSON.msg);
+                }
+            })
+            return false;
+        });
+
+    });
+
+</script>
+{/block}

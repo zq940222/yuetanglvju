@@ -1,0 +1,162 @@
+{extend name="base/base"}
+{block name="main"}
+<blockquote class="layui-elem-quote">
+    <span style="font-size:18px;">运费模板详情页</span>
+    <a href="{:url('lists')}" class="layui-btn layui-btn-sm" style="float:right;">返回列表</a>
+</blockquote>
+<form class="layui-form layui-form-pane" action="{:url('add')}" method="post" enctype="multipart/form-data">
+    <div class="layui-form-item">
+        <label class="layui-form-label">模板名称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="template_name" lay-verify="required" required placeholder="请输入模板名称" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-inline">
+            <input type="radio" name="is_enable_default" value="1" title="是" lay-filter="is_enable_default">
+            <input type="radio" name="is_enable_default" value="0" title="否" checked lay-filter="is_enable_default">
+        </div>
+        <div class="layui-form-mid layui-word-aux">是否启用默认配送配置</div>
+    </div>
+    <a class="layui-btn" id="add" onclick="false">
+        <i class="layui-icon">&#xe608;</i> 添加自定义区域
+    </a>
+    <table class="layui-table" id="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>配送区域</th>
+                <th>首件</th>
+                <th>运费</th>
+                <th>续件</th>
+                <th>运费</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="config_list">
+
+        </tbody>
+    </table>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="*">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+
+</form>
+{/block}
+{block name="javascript"}
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    function call_back(area_list) {
+        var area_list_name = '';
+        var area_list_id = '';
+        $.each(area_list, function (index, item) {
+            area_list_name += item.name + ',';
+            area_list_id += item.id + ',';
+        });
+        var area_focus = $('.select_area_focus');
+        if(area_list_id.length > 1){
+            area_list_id = area_list_id.substr(0,area_list_id.length-1);
+            area_list_name = area_list_name.substr(0,area_list_name.length-1);
+        }
+        area_focus.val(area_list_name);
+        area_focus.parent().find('.area_ids').val(area_list_id);
+        layer.closeAll('iframe');
+    }
+
+    layui.use(['layer', 'table', 'laydate', 'form'], function() {
+        var layer = layui.layer, table = layui.table, $ = layui.jquery, laydate = layui.laydate, form = layui.form;
+
+
+        //监听表单提交
+        form.on('submit(*)', function (data) {
+            $.ajax({
+                url:'save',
+                type:'post',
+                data:data.field,
+                success:function (data) {
+                    var code = data.code.toString();
+                    var startChar = code.charAt(0);
+                    if (startChar == '2')
+                    {
+                        layer.alert(data.msg, {icon: 6},function () {
+                            window.location.href='{:url("lists")}'
+                        });
+                    }else{
+                        layer.alert(data.msg, {icon: 7});
+                    }
+                },
+                error:function (error) {
+                    layer.msg(error.responseJSON.msg);
+                }
+            })
+            return false;
+        })
+        //监听单选
+        form.on('radio(is_enable_default)', function(data){
+            if(data.value == 1) {
+                initDefault();
+            }else{
+                $('.default_config').remove();
+            }
+        });
+
+        $("#add").on('click',function () {
+            var html =  '<tr><td>' +
+                '<input name="is_default[]" value="0" type="hidden"></td> <td>' +
+                '<input class="select_area" readonly name="" value="" lay-verify="required" type="text"> <input name="area_ids[]" lay-verify="required" class="area_ids" value="" type="hidden"> ' +
+                '<input name="config_id[]" value="" type="hidden"></td> <td>' +
+                '<input name="first_unit[]" lay-verify="required" value="" onpaste="this.value=this.value.replace(/[^\\d.]/g,\'\')" onkeyup="this.value=this.value.replace(/[^\\d.]/g,\'\')" type="text"> ' +
+                '<span class="first_unit_span">件</span> </td> <td >' +
+                '<input name="first_money[]" lay-verify="required" value="" type="text"><span>元</span></td> <td >' +
+                '<input name="continue_unit[]" lay-verify="required" value="" onpaste="this.value=this.value.replace(/[^\\d.]/g,\'\')" onkeyup="this.value=this.value.replace(/[^\\d.]/g,\'\')" type="text"> ' +
+                '<span class="continue_unit_span">件</span></td> <td>' +
+                '<input name="continue_money[]" lay-verify="required" value="" type="text"><span>元</span> </td> <td > ' +
+                '<a class="layui-btn layui-btn-danger layui-btn-xs del">删除</a> </td> </tr>';
+            $('#config_list').append(html);
+        });
+
+
+        $(function () {
+            $(document).on("click", '.select_area', function (e) {
+                $('.select_area').removeClass('select_area_focus');
+                $(this).addClass('select_area_focus');
+                var url = "area";
+                layer.open({
+                    type: 2,
+                    title: '选择地区',
+                    shadeClose: true,
+                    shade: 0.2,
+                    area: ['420px', '400px'],
+                    content: url
+                });
+            })
+        })
+
+        $("#config_list").on('click','.del',function () {
+            $(this).parent().parent().remove();
+        })
+
+        function initDefault(){
+            var default_config_length = $('.default_config').length;
+            if (default_config_length == 0) {
+                var html =  '<tr class="default_config"><td class="left">' +
+                    '默认配置<input name="is_default[]" value="1" type="hidden"></td> <td> ' +
+                    '<input readonly name="" value="中国" type="text"> <input name="area_ids[]" class="area_ids" value="100000" type="hidden"> ' +
+                    '<input name="config_id[]" value="" type="hidden"> </td> <td>' +
+                    '<input name="first_unit[]" value="" lay-verify="required" onpaste="this.value=this.value.replace(/[^\\d.]/g,\'\')" onkeyup="this.value=this.value.replace(/[^\\d.]/g,\'\')" type="text"> ' +
+                    '<span class="first_unit_span">件</span></td> <td align="left"> ' +
+                    '<input name="first_money[]" value="" lay-verify="required" type="text"><span>元</span></td> <td >' +
+                    '<input name="continue_unit[]" value="" lay-verify="required" onpaste="this.value=this.value.replace(/[^\\d.]/g,\'\')" onkeyup="this.value=this.value.replace(/[^\\d.]/g,\'\')" type="text"> ' +
+                    '<span class="continue_unit_span">件</span> </td> <td> ' +
+                    '<input name="continue_money[]" lay-verify="required" value="" type="text"><span>元</span></td> <td > ' +
+                    '</td> </tr>';
+                $('#config_list').prepend(html);
+            }
+        }
+
+    })
+</script>
+{/block}

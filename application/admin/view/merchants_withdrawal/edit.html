@@ -1,0 +1,107 @@
+{extend name="base/base"}
+{block name="main"}
+<div class="layui-anim layui-anim-up layui-field-box">
+    <form class="layui-form layui-form-pane" action="" method="post" enctype="multipart/form-data">
+        <table class="layui-table">
+            <tr>
+                <td>酒店ID</td>
+                <td>{$data.hotel_id}</td>
+            </tr>
+            <tr>
+                <td>酒店名</td>
+                <td>{$data.hotel_name}</td>
+            </tr>
+            <tr>
+                <td>酒店可提现余额</td>
+                <td>{$data.hotel.income}</td>
+            </tr>
+            <tr>
+                <td>申请提现金额</td>
+                <td>{$data.money}</td>
+            </tr>
+            <tr>
+                <td>申请提现银行</td>
+                <td>{$data.bank_name}</td>
+            </tr>
+            <tr>
+                <td>银行账号</td>
+                <td>{$data.bank_account_num}</td>
+            </tr>
+            <tr>
+                <td>银行账户名</td>
+                <td>{$data.bank_account}</td>
+            </tr>
+            <tr>
+                <td>申请时间</td>
+                <td>{$data.create_time}</td>
+            </tr>
+            <tr>
+                <td>处理</td>
+                <td>
+                    <input type="radio" name="status" value="1" title="待审核" {if condition="$data.status==1"}checked{/if}>
+                    <input type="radio" name="status" value="2" title="审核通过" {if condition="$data.status==2"}checked{/if}>
+                    <input type="radio" name="status" value="-1" title="审核失败" {if condition="$data.status==-1"}checked{/if}>
+                </td>
+            </tr>
+            <tr>
+                <td>备注</td>
+                <td>
+                    <textarea name="remark" required lay-verify="required" placeholder="请输入" class="layui-textarea">{$data.remark}</textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>提现流程</td>
+                <td>
+                    1:店家前台申请提现
+                    2:管理员审核通过
+                    3:进入财务待转款列表
+                    4:财务管理员给用户转账(转帐时自动扣除用户平台余额)
+                </td>
+            </tr>
+        </table>
+        <input type="hidden" value="{$data.id}" name="id">
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="*">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+{/block}
+{block name="javascript"}
+<script>
+    layui.use(['form'],function () {
+        var form = layui.form,$ = layui.jquery;
+
+        //监听提交
+        form.on('submit(*)', function(data){
+            console.log(data.field);
+            $.ajax({
+                url:'edit',
+                type:'post',
+                data:data.field,
+                success:function (data) {
+                    var code = data.code.toString();
+                    var startChar = code.charAt(0);
+                    if (startChar == '2')
+                    {
+                        layer.alert(data.msg, {icon: 6},function () {
+                            // 获得frame索引
+                            var index = parent.layer.getFrameIndex(window.name);
+                            //关闭当前frame
+                            parent.layer.close(index);
+                        });
+                    }else{
+                        layer.alert(data.msg, {icon: 7});
+                    }
+                },
+                error:function (error) {
+                    layer.msg(error.responseJSON.msg);
+                }
+            })
+            return false;
+        });
+    })
+</script>
+{/block}

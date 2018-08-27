@@ -1,0 +1,35 @@
+{extend name="base/base"}
+{block name="main"}
+<blockquote class="layui-elem-quote">
+    <i class="layui-icon" style="font-size: 24px;">&#xe62d;</i>
+    <span style="font-size:18px;">众筹</span>
+</blockquote>
+<a class="layui-btn" href="{:url('edit')}?id={$crowdfunding.id}">
+    <i class="layui-icon">&#xe608;</i> 编辑
+</a>
+<fieldset class="layui-elem-field">
+    <legend>众筹</legend>
+    <div class="layui-field-box">
+        <table class="layui-table">
+            <tbody>
+            <tr>
+                <th>广告图</th>
+                <td><img src="{$crowdfunding.image.url}" alt=""></td>
+            </tr>
+            <tr>
+                <th>内容</th>
+                <td>{$crowdfunding.content}</td></tr>
+            </tbody>
+        </table>
+    </div>
+</fieldset>
+{/block}
+{block name="javascript"}
+<script>
+    layui.use(['layer','table'], function(){
+        var layer = layui.layer, table = layui.table;
+        var $ = layui.jquery;
+
+    });
+</script>
+{/block}

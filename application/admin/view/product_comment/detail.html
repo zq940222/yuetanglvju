@@ -1,0 +1,33 @@
+{extend name="base/base"}
+{block name="main"}
+    <fieldset class="layui-elem-field">
+        <legend>评价信息</legend>
+        <div class="layui-field-box">
+            <table class="layui-table">
+                <tbody>
+                <tr>
+                    <th>产品名称</th>
+                    <td>{$data.product.title}</td></tr>
+                <tr>
+                    <th>用户名</th>
+                    <td>{$data.user.nickname}</td></tr>
+                <tr>
+                    <th>评论内容</th>
+                    <td>{$data.content}</td></tr>
+                <tr>
+                    <th>评论图片</th>
+                    <td>
+                        {volist name="data.image" id="item"}
+                        <img src="{$item.url}" alt="">
+                        {/volist}
+                    </td></tr>
+                <tr>
+                    <th>评分</th>
+                    <td>{$data.score}</td></tr>
+                <tr>
+                    <th>创建时间</th>
+                    <td>{$data.create_time}</td></tr>
+            </table>
+        </div>
+    </fieldset>
+{/block}

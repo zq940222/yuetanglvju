@@ -1,0 +1,97 @@
+{extend name="base/base"}
+{block name="main"}
+<fieldset class="layui-elem-field">
+    <legend>基本信息</legend>
+    <div class="layui-field-box">
+        <table class="layui-table">
+            <tbody>
+            <tr>
+                <th>酒店名称</th>
+                <td>{$hotel.name}</td>
+            </tr>
+            <tr>
+                <th>头部展示图片</th>
+                <td><img src="{$hotel.image.url}" alt=""></td>
+            </tr>
+            <tr>
+                <th>起价</th>
+                <td>{$hotel.min_price}</td>
+            </tr>
+            <tr>
+                <th>地址</th>
+                <td>
+                    {$hotel.province.name?$hotel.province.name:''},{$hotel.city.name?$hotel.city.name:''},{$hotel.district.name?$hotel.district.name:''},{$hotel.detail_address}
+                </td>
+            </tr>
+            <tr>
+                <th>备注</th>
+                <td>{$hotel.remark}</td>
+            </tr>
+            <tr>
+                <th>景区</th>
+                <td>{$hotel.scenic_area.name}</td>
+            </tr>
+            <tr>
+                <th>联系电话</th>
+                <td>{$hotel.phone}</td>
+            </tr>
+            <tr>
+                <th>营业执照</th>
+                <td><img src="{$hotel.business_license.url}" alt=""></td>
+            </tr>
+        </table>
+
+    </div>
+    <form class="layui-form">
+        <input type="hidden" name="id" value="{$hotel.id}">
+        <div class="layui-form-item">
+            <label class="layui-form-label">操作</label>
+            <div class="layui-input-block">
+                <input type="radio" name="status" value="0" title="申请中" checked>
+                <input type="radio" name="status" value="1" title="同意">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="*">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</fieldset>
+
+{/block}
+{block name="javascript"}
+<script>
+    layui.use(['layer', 'table', 'laydate', 'form'], function(){
+        var layer = layui.layer, table = layui.table, $ = layui.jquery, laydate = layui.laydate, form = layui.form;
+        //监听提交
+        form.on('submit(*)', function (data) {
+            $.ajax({
+                url: 'detail',
+                type: 'post',
+                data: data.field,
+                success: function (data) {
+                    var code = data.code.toString();
+                    var startChar = code.charAt(0);
+                    if (startChar == '2')
+                    {
+                        layer.alert(data.msg, {icon: 6},function () {
+                            // 获得frame索引
+                            var index = parent.layer.getFrameIndex(window.name);
+                            //关闭当前frame
+                            parent.layer.close(index);
+                        });
+                    }else{
+                        layer.alert(data.msg, {icon: 7});
+                    }
+                },
+                error: function (error) {
+                    layer.msg(error.responseJSON.msg);
+                }
+            })
+            return false;
+        });
+    });
+</script>
+{/block}

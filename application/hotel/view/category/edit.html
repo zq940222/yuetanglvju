@@ -1,0 +1,67 @@
+{extend name="base/base"}
+{block name="main"}
+<div class="layui-anim layui-anim-up layui-field-box">
+    <form class="layui-form layui-form-pane" action="{:url('edit')}" method="post" enctype="multipart/form-data">
+        {volist name="filtrate" id="items"}
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$items.name}</label>
+            <div class="layui-input-block">
+                {volist name="items.children" id="item"}
+                <input type="checkbox" name="filtrate_id[]" title="{$item.name}" value="{$item.id}" lay-skin="primary" {if condition="in_array($item.id,$category_ids)"}checked{/if}>
+                {/volist}
+            </div>
+        </div>
+        <hr class="layui-bg-green">
+        {/volist}
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="*">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+{/block}
+{block name="javascript"}
+<script>
+    layui.use(['form'],function () {
+        var form = layui.form,$ = layui.jquery;
+        form.verify({
+            group:function(value,item) {
+                if (value < 2) {
+                    return '拼团人数不能小于2';
+                }
+            }
+        })
+
+        //监听提交
+        form.on('submit(*)', function(data){
+            $.ajax({
+                url:'edit',
+                type:'post',
+                data:data.field,
+                success:function (data) {
+                    var code = data.code.toString();
+                    var startChar = code.charAt(0);
+                    if (startChar == '2')
+                    {
+                        layer.alert(data.msg, {icon: 6},function () {
+                            // 获得frame索引
+                            var index = parent.layer.getFrameIndex(window.name);
+                            //关闭当前frame
+                            parent.layer.close(index);
+                        });
+                    }else{
+                        layer.alert(data.msg, {icon: 7});
+                    }
+                },
+                error:function (error) {
+                    layer.msg(error.responseJSON.msg);
+                }
+            })
+            return false;
+        });
+    })
+</script>
+{/block}

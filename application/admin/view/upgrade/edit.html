@@ -1,0 +1,95 @@
+{extend name="base/base"}
+{block name="main"}
+<div class="layui-anim layui-anim-up layui-field-box">
+    <form class="layui-form" action="{:url('edit')}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$version.id}">
+        <div class="layui-form-item">
+            <label class="layui-form-label">版本号</label>
+            <div class="layui-input-inline">
+                <input type="text" name="version" lay-verify="required" placeholder="请输入版本号" class="layui-input" value="{$version.version}">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">类型</label>
+            <div class="layui-input-inline">
+                <select name="type" lay-verify="">
+                    <option value="0">请选择一个类型</option>
+                    <option value="1" {if condition="$version.type=='不强制升级'"} selected{/if}>不强制升级</option>
+                    <option value="2" {if condition="$version.type=='强制升级'"} selected{/if}>强制升级</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">ios下载</label>
+            <div class="layui-input-inline">
+                <input type="text" name="ios_apk_url" lay-verify="required" placeholder="请输入ios下载地址" class="layui-input" value="{$version.ios_apk_url}">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">安卓下载</label>
+            <div class="layui-input-inline">
+                <input type="text" name="android_apk_url" lay-verify="required" placeholder="请输入安卓下载地址" class="layui-input" value="{$version.android_apk_url}">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">更新内容</label>
+            <div class="layui-input-inline">
+                <textarea name="upgrade_point" required lay-verify="required" placeholder="请输入更新内容" class="layui-textarea">{$version.upgrade_point}</textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+                <input type="radio" name="status" value="1" title="开启" {if condition="$version.status==1"}checked{/if}>
+                <input type="radio" name="status" value="0" title="未开启" {if condition="$version.status==0"}checked{/if}>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="*">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+{/block}
+{block name="javascript"}
+<script>
+    layui.use('form', function () {
+        var form = layui.form, $ = layui.jquery;
+
+        //监听提交
+        form.on('submit(*)', function (data) {
+            $.ajax({
+                url: 'edit',
+                type: 'post',
+                data: data.field,
+                success: function (data) {
+                    var code = data.code.toString();
+                    var startChar = code.charAt(0);
+                    if (startChar == '2')
+                    {
+                        layer.alert(data.msg, {icon: 6},function () {
+                            // 获得frame索引
+                            var index = parent.layer.getFrameIndex(window.name);
+                            //关闭当前frame
+                            parent.layer.close(index);
+                        });
+                    }else{
+                        layer.alert(data.msg, {icon: 7});
+                    }
+                },
+                error: function (error) {
+                    layer.msg(error.responseJSON.msg);
+                }
+            })
+            return false;
+        });
+    });
+</script>
+{/block}

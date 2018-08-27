@@ -1,0 +1,100 @@
+{extend name="base/base"}
+{block name="main"}
+<blockquote class="layui-elem-quote">
+    <form action="lists" class="layui-form" type="post">
+        <div class="layui-input-inline">
+            <input type="text" name="nickname" class="layui-input" placeholder="请输入会员名">
+        </div>
+        <div class="layui-input-inline">
+            <select name="gender">
+                <option value="-1">性别</option>
+                <option value="0">未知</option>
+                <option value="1">男</option>
+                <option value="2">女</option>
+            </select>
+        </div>
+
+        <div class="layui-input-inline">
+            <input type="text" name="mobile" class="layui-input" placeholder="请输入手机号">
+        </div>
+
+        <button lay-submit class="layui-btn" lay-filter="search"> 查询 </button>
+    </form>
+</blockquote>
+
+<table id="list" lay-filter="list"></table>
+
+{/block}
+{block name="javascript"}
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+    <a class="layui-btn layui-btn-xs" lay-event="restore">还原</a>
+</script>
+
+<script>
+
+    layui.use(['layer', 'table', 'laydate', 'form'], function(){
+        var layer = layui.layer, table = layui.table, $ = layui.jquery, laydate = layui.laydate, form = layui.form;
+
+        //表格数据
+        table.render({
+            elem: '#list'
+            ,height: 600
+            ,url: 'page' //数据接口
+            ,page: true //开启分页
+            ,cols: [[ //表头
+                {type:'checkbox'},
+                {field: 'id', title: 'ID', width:80, sort: true}
+                ,{field: 'nickname', title: '昵称'}
+                ,{field: 'mobile', title: '手机号'}
+                ,{field: 'gender', title: '性别'}
+                ,{field: 'balance', title: '余额', sort: true}
+                ,{field: 'integral', title: '积分', sort: true}
+                ,{field: 'create_time', title: '创建时间', sort: true}
+                ,{fixed: 'right', title: '操作', width:178, align:'center', toolbar: '#bar'}
+            ]]
+        })
+
+        //监听工具条
+        table.on('tool(list)', function(obj){
+            if (obj.event === 'detail'){
+                //详情
+                layer.open({
+                    type: 2,
+                    area: ['600px', '400px'],
+                    fixed: false, //不固定
+                    maxmin: true,
+                    content: '{:url("detail")}?id='+obj.data.id
+                });
+            }else if(obj.event === 'restore'){
+                layer.msg('你确定还原么？', {
+                    time: 0 //不自动关闭
+                    , btn: ['确定', '取消']
+                    , yes: function (index) {
+                        $.post('{:url("restore")}', {id: obj.data.id}, function (data) {
+                            var code = data.code.toString();
+                            var startChar = code.charAt(0);
+                            if (startChar == '2')
+                            {
+                                obj.del();
+                                layer.close(index);
+                                layer.alert(data.msg, {icon: 6});
+                            }else{
+                                layer.alert(data.msg, {icon: 7});
+                            }
+                        });
+                    }
+                })
+            }
+        });
+
+        // 监听表单提交事件
+        form.on('submit(search)', function(data) {
+            table.reload('list', {
+                where:data.field
+            });
+            return false; // 阻止表单提交
+        })
+    });
+</script>
+{/block}

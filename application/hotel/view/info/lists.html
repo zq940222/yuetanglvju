@@ -1,0 +1,66 @@
+{extend name="base/base"}
+{block name="main"}
+<blockquote class="layui-elem-quote">
+    <span style="vertical-align: inherit;">欢迎管理员：</span>
+    <span class="x-red">{:session('admin.account')}</span>
+    <span style="vertical-align: inherit;">！当前时间：{:date('Y-m-d H:i:s')}</span>
+</blockquote>
+
+<fieldset class="layui-elem-field">
+    <legend>基本信息</legend>
+    <div class="layui-field-box">
+        <button class="layui-btn" id="edit">
+            编辑
+        </button>
+        <table class="layui-table">
+            <tbody><tr>
+                <td class="gray_bg">酒店名称:</td>
+                <td>{$hotel.name}</td>
+                <td class="gray_bg">封面图片:</td>
+                <td><img src="{$hotel.image.url}" alt=""></td>
+            </tr>
+            <tr>
+                <td class="gray_bg">省市区:</td>
+                <td>{$hotel.province_name.name}{$hotel.city_name.name}{$hotel.district_name.name}</td>
+                <td class="gray_bg">详细地址:</td>
+                <td>{$hotel.detail_address}</td>
+            </tr>
+            <tr>
+                <td class="gray_bg">备注:</td>
+                <td>{$hotel.remark}</td>
+                <td class="gray_bg">景区:</td>
+                <td>{$hotel.scenic_area.name}</td>
+            </tr>
+            <tr>
+                <td class="gray_bg">联系电话:</td>
+                <td>{$hotel.phone}</td>
+                <td class="gray_bg">起价:</td>
+                <td>{$hotel.min_price}</td>
+            </tr>
+            </tbody></table>
+    </div>
+</fieldset>
+{/block}
+{block name="javascript"}
+<script>
+    layui.use(['layer', 'table', 'laydate', 'form'], function() {
+        var layer = layui.layer, table = layui.table, $ = layui.jquery, laydate = layui.laydate, form = layui.form;
+
+        $("#edit").on('click', function () {
+            //iframe层-父子操作
+            var index = layer.open({
+                type: 2,
+                title: '编辑信息',
+                area: ['600px', '400px'],
+                maxmin: true,
+                fixed: false, //不固定
+                content: '{:url("edit")}',
+                end: function () {
+                    location.reload();
+                }
+            });
+            layer.full(index);
+        })
+    });
+</script>
+{/block}

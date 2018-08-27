@@ -1,0 +1,37 @@
+{extend name="base/base"}
+{block name="main"}
+    <fieldset class="layui-elem-field">
+        <legend>基本信息</legend>
+        <div class="layui-field-box">
+            <table class="layui-table">
+                <tbody>
+                <tr>
+                    <th>用户昵称</th>
+                    <td>{$user.nickname}</td></tr>
+                <tr>
+                    <th>头像</th>
+                    <td><img src="{$user.image.url}" alt=""></td></tr>
+                <tr>
+                    <th>手机号</th>
+                    <td>{$user.mobile}</td></tr>
+                <tr>
+                    <th>性别</th>
+                    <td>{$user.gender}</td></tr>
+                <tr>
+                    <th>余额</th>
+                    <td>{$user.balance}</td></tr>
+                <tr>
+                    <th>积分</th>
+                    <td>{$user.integral}</td></tr>
+            </table>
+        </div>
+    </fieldset>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['layer', 'table', 'laydate', 'form'], function(){
+        var layer = layui.layer, table = layui.table, $ = layui.jquery, laydate = layui.laydate, form = layui.form;
+
+    });
+</script>
+{/block}

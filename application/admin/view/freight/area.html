@@ -1,0 +1,148 @@
+{extend name="base/base"}
+{block name="main"}
+<div>
+
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <div class="layui-input-inline"  id="area_list">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">省份</label>
+            <div class="layui-input-inline">
+                <select name="province" id="province" lay-search lay-filter="province">
+                    <option value="0">-省-</option>
+                    {volist name="province" id="item"}
+                    <option value="{$item.id}">{$item.name}</option>
+                    {/volist}
+                </select>
+            </div>
+
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">城市</label>
+            <div class="layui-input-inline">
+                <select name="city" id="city" lay-search lay-filter="city">
+                    <option value="0">-市-</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">地区</label>
+            <div class="layui-input-inline">
+                <select name="district" id="district" lay-search lay-filter="district">
+                    <option value="0">-区-</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="add">添加</button>
+                <button class="layui-btn" lay-submit lay-filter="*">确定</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+{/block}
+{block name="javascript"}
+<script>
+    layui.use(['layer', 'table', 'laydate', 'form'], function() {
+        var layer = layui.layer, table = layui.table, $ = layui.jquery, laydate = layui.laydate, form = layui.form;
+        form.on('select(province)', function(data) {
+            var $next = $("#city");
+            $next.get(0).options.length=1;
+            var $next2 = $("#district");
+            $next2.get(0).options.length=1;
+            var id = data.value;
+            $.post("{:url('getRegion')}", {id:id}, function(data) {
+                $.each(data, function(index, item) {
+                    var $option = $('<option value="'+item.id+'">'+item.name+'</option>');
+                    $next.append($option);
+                });
+                form.render('select');//重新渲染
+            });
+
+        });
+        form.on('select(city)', function(data) {
+            var $next = $("#district");
+            $next.get(0).options.length=1;
+            var id = data.value;
+            $.post("{:url('getRegion')}", {id:id}, function(data) {
+                $.each(data, function(index, item) {
+                    var $option = $('<option value="'+item.id+'">'+item.name+'</option>');
+                    $next.append($option);
+                });
+                form.render('select');//重新渲染
+            });
+
+        });
+
+        form.on('submit(*)',function (data) {
+            var input = $("input[type='checkbox']:checked");
+            if (input.length == 0) {
+                layer.alert('请添加区域', {icon: 2});
+                return false;
+            }
+            var area_list = new Array();
+            input.each(function(i,o){
+                var area_id = $(this).attr("value");
+                var area_name = $(this).attr("title");
+                var cartItemCheck = new Area(area_id,area_name);
+                area_list.push(cartItemCheck);
+                window.parent.call_back(area_list);
+            })
+            return false;
+        })
+
+        //地区对象
+        function Area(id, name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        form.on('submit(add)', function (data) {
+            var province = data.field.province; // 省份
+            var city = data.field.city;        // 城市
+            var district = data.field.district; // 县镇
+            var text = '';  // 中文文本
+            var tpl = ''; // 输入框 html
+            var is_set = 0; // 是否已经设置了
+
+            // 设置 县镇
+            if (district > 0) {
+                text = $("#district").find('option:selected').text();
+                tpl = '<input type="checkbox" name="area_list[]" title="' + text + '" value="' + district + '" checked>';
+                is_set = district; // 街道设置了不再设置市
+            }
+            // 如果县镇没设置 就获取城市
+            if (is_set == 0 && city > 0) {
+                text = $("#city").find('option:selected').text();
+                tpl = '<input type="checkbox" name="area_list[]" title="' + text + '" value="' + city + '" checked>';
+                is_set = city;  // 市区设置了不再设省份
+
+            }
+            // 如果城市没设置  就获取省份
+            if (is_set == 0 && province > 0) {
+                text = $("#province").find('option:selected').text();
+                tpl = '<input type="checkbox" name="area_list[]" title="' + text + '" value="' + province + '" checked>';
+                is_set = province;
+
+            }
+
+            var obj = $("input[type='checkbox']"); // 已经设置好的复选框拿出来
+            var exist = 0;  // 表示下拉框选择的 是否已经存在于复选框中
+            $(obj).each(function () {
+                if ($(this).val() == is_set) {  //当前下拉框的如果已经存在于 复选框 中
+                    layer.alert('已经存在该区域', {icon: 2});  // alert("已经存在该区域");
+                    exist = 1; // 标识已经存在
+                }
+            })
+            if (!exist)
+                $('#area_list').append(tpl); // 不存在就追加进 去
+            form.render();
+            return false;
+        });
+    })
+</script>
+{/block}

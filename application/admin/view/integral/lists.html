@@ -1,0 +1,27 @@
+{extend name="base/base"}
+{block name="main"}
+<table class="layui-table" lay-filter="table">
+    <thead>
+    <tr>
+        <th lay-data="{field:'integral_ratio'}">获取积分百分比(%)</th>
+        <th lay-data="{field:'royalty_ratio'}">抽成百分比(%)</th>
+        <th lay-data="{field:'update_time'}">上次修改时间</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>
+            {$data.integral_ratio}
+        </td>
+        <td>
+            {$data.royalty_ratio}
+        </td>
+        <td>{$data.update_time}</td>
+        <td>
+            <a href="{:url('edit', 'id='.$data['id'])}" class="layui-btn layui-btn-sm"><i class="layui-icon">&#xe642;</i></a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+{/block}

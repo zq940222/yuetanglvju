@@ -1,0 +1,80 @@
+{extend name="base/base"}
+{block name="main"}
+<blockquote class="layui-elem-quote">
+    <i class="layui-icon" style="font-size: 24px;">&#xe62d;</i>
+    <span style="font-size:18px;">添加分类</span>
+    <a href="{:url('lists')}" class="layui-btn layui-btn-sm" style="float:right;">返回列表</a>
+</blockquote>
+<form class="layui-form layui-form-pane1" action="{:url('add')}" method="post" enctype="multipart/form-data">
+    <div class="layui-form-item">
+        <label class="layui-form-label">分类名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" lay-verify="required" required placeholder="请输入分类名称" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">分类排序</label>
+        <div class="layui-input-block">
+            <input type="text" name="sort" class="layui-input" lay-verify="number">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">所属分类</label>
+        <div class="layui-input-inline">
+            <select name="parent_id" lay-filter="parent_id" lay-search="">
+                <option value="0"> 一级分类 </option>
+                {volist name="category" id="item"}
+                <option value="{$item.id}">{$item.name}</option>
+                {/volist}
+            </select>
+        </div>
+        <div class="layui-form-mid layui-word-aux" id="showCateMsg">默认为一级分类</div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="*">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+{/block}
+{block name="javascript"}
+<script>
+    layui.use('form', function(){
+        var form = layui.form, $ = layui.jquery;
+        form.on('select(parent_id)', function(data) {
+            if(data.value>0) {
+                var catename=$(data.elem).find(':selected').text();
+                $('#showCateMsg').html(catename+'的子分类');
+            } else {
+                $('#showCateMsg').html('一级分类');
+            }
+        });
+        //监听提交
+        form.on('submit(*)', function(data){
+            $.ajax({
+                url:'add',
+                type:'post',
+                data:data.field,
+                success:function (data) {
+                    var code = data.code.toString();
+                    var startChar = code.charAt(0);
+                    if (startChar == '2')
+                    {
+                        layer.alert(data.msg, {icon: 6},function () {
+                            location.href="lists"
+                        });
+                    }else{
+                        layer.alert(data.msg, {icon: 7});
+                    }
+
+                },
+                error:function (error) {
+                    layer.msg(error.responseJSON.msg);
+                }
+            })
+            return false;
+        });
+    });
+</script>
+{/block}

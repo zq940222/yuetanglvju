@@ -1,0 +1,59 @@
+{extend name="base/base"}
+{block name="main"}
+<blockquote class="layui-elem-quote">
+    <i class="layui-icon" style="font-size: 24px;">&#xe62d;</i>
+    <span style="font-size:18px;">房间设施列表</span>
+    <a href="{:url('RoomFacility/add')}" class="layui-btn layui-btn-sm" style="float:right;">添加房间设施</a>
+</blockquote>
+<table class="layui-table" lay-filter="table" id="list">
+    <thead>
+    <tr>
+        <th lay-data="{checkbox:true}">ID</th>
+        <th lay-data="{field:'name'}">名称</th>
+        <th lay-data="{field:'sort'}">排序</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {volist name="facilityList" id="item"}
+    <tr>
+        <td>{$item.id}</td>
+        <td>
+            {if condition="$item['parent_id']>0"}--{/if}
+            {$item.name}
+        </td>
+
+        <td>{$item.sort}</td>
+        <td>
+            <a href="{:url('edit', 'id='.$item['id'])}" class="layui-btn layui-btn-sm"><i class="layui-icon">&#xe642;</i></a><a  cid="{$item.id}" class="delete layui-btn layui-btn-sm layui-btn-danger" data-method="confirmTrans"><i class="layui-icon">&#xe640;</i></a>
+        </td>
+    </tr>
+    {/volist}
+    </tbody>
+</table>
+{/block}
+{block name="javascript"}
+<script>
+    layui.use(['layer','table'], function(){
+        var layer = layui.layer, table = layui.table;
+        var $ = layui.jquery;
+        $('.delete').bind('click', function() {
+            var id=$(this).attr('cid');
+            layer.confirm('确认删除此分类以及所有子分类吗?', function(index){
+                $.post('{:url("delete")}', {id:id}, function(data) {
+                    var code = data.code.toString();
+                    var startChar = code.charAt(0);
+                    if (startChar == '2')
+                    {
+                        layer.close(index);
+                        layer.alert(data.msg, {icon: 6});
+                        table.reload('list')
+                    }else{
+                        layer.alert(data.msg, {icon: 7});
+                    }
+                });
+            });
+        });
+    });
+</script>
+{/block}

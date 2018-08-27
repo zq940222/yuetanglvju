@@ -1,0 +1,113 @@
+{extend name="base/base"}
+{block name="main"}
+<div class="layui-anim layui-anim-up layui-field-box">
+    <form class="layui-form layui-form-pane" action="{:url('model')}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$product['id']}">
+        <div class="layui-form-item">
+            <label class="layui-form-label">商品模型</label>
+            <div class="layui-input-inline">
+                <select name="type" lay-verify="type" lay-filter="type" lay-search="">
+                    <option value="0"> -请选择商品模型- </option>
+                    {volist name="product_type" id="item"}
+                    <option value="{$item.id}" {if condition="$item.id==$product.product_type_id"}selected{/if}>{$item.name}</option>
+                    {/volist}
+                </select>
+            </div>
+        </div>
+        <div id="ajax_spec_data">
+            <table id="product_spec" lay-filter="product_spec" class="layui-table">
+                <thead>
+                <tr>
+                    <td colspan="2"><b>商品规格:</b></td>
+                </tr>
+                </thead>
+
+                {volist name="spec" id="items"}
+                <tr>
+                    <td>{$items.name}</td>
+
+                    <td>
+                        {volist name="items.item" id="item"}
+                        <button class="layui-btn layui-btn-radius layui-btn-primary" lay-filter="">
+                            {$item.item}
+                        </button>
+                        {/volist}
+
+                    </td>
+                </tr>
+                {/volist}
+            </table>
+            <div id="goods_spec_table2"> <!--ajax 返回 规格对应的库存--> </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="*">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+{/block}
+{block name="javascript"}
+<script>
+    layui.use(['form','table','upload'], function() {
+        var form = layui.form, table = layui.table, $ = layui.jquery, upload = layui.upload;
+
+        form.on('select(type)', function(data){
+            var product_id = '{$product.id}';
+            var spec_type = data.value;
+            $.ajax({
+                type:'GET',
+                data:{product_id:product_id,spec_type:spec_type},
+                url:"{:url('Goods/ajaxGetSpecSelect')}",
+                success:function(data){
+                    $("#ajax_spec_data").html('')
+                    $("#ajax_spec_data").append(data);
+                }
+            });
+
+        });
+        var product_id = '{$product.id}';
+        var spec_type = '{$product.product_type_id}';
+        $.ajax({
+            type:'GET',
+            data:{product_id:product_id,spec_type:spec_type},
+            url:"{:url('Goods/ajaxGetSpecSelect')}",
+            success:function(data){
+                $("#ajax_spec_data").html('')
+                $("#ajax_spec_data").append(data);
+            }
+        });
+
+        //监听提交
+        form.on('submit(*)', function(data) {
+            
+            $.ajax({
+                url:'model',
+                type:'post',
+                data:data.field,
+                success:function (data) {
+                    var code = data.code.toString();
+                    var startChar = code.charAt(0);
+                    if (startChar == '2')
+                    {
+                        layer.alert(data.msg, {icon: 6},function () {
+                            // 获得frame索引
+                            var index = parent.layer.getFrameIndex(window.name);
+                            //关闭当前frame
+                            parent.layer.close(index);
+                        });
+                    }else{
+                        layer.alert(data.msg, {icon: 7});
+                    }
+                },
+                error:function (error) {
+                    layer.msg(error.responseJSON.msg);
+                }
+            })
+            return false;
+        });
+
+    });
+</script>
+{/block}
