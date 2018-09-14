@@ -52,8 +52,10 @@ class Hotel
         // 有经纬度则显示距离 ,没有则显示位置
         (new PagingParameter())->goCheck();
         (new City())->goCheck();
-        $where = ['level_type' => 2,'name' => $city];
-        $city = Region::where($where)->find();
+        $where = [];
+        $where['level_type'] = ['=',2];
+        $where['name|id'] = ['=',$city];
+        $city = model('Region')->where($where)->find();
         $hotelData = HotelService::getRecommendHotel($city['id'], $page, $size, $lat, $lon,$min_price, $max_price, $max_distance, $hotel_style_id);
 
         return $hotelData;
@@ -80,8 +82,9 @@ class Hotel
         // 有经纬度则显示距离 ,没有则显示位置
         (new PagingParameter())->goCheck();
         (new City())->goCheck();
-        $where = ['level_type' => 2,'name' => $city];
-        $city = Region::where($where)->find();
+        $where['level_type'] = ['=',2];
+        $where['name|id'] = ['=',$city];
+        $city = model('Region')->where($where)->find();
 
         $district = input('param.district/s','');
         $scenicAreaID = input('param.scenic_area_id/d',0);
@@ -114,8 +117,9 @@ class Hotel
     {
         (new PagingParameter())->goCheck();
         (new City())->goCheck();
-        $where = ['level_type' => 2,'name' => $city];
-        $city = Region::where($where)->find();
+        $where['level_type'] = ['=',2];
+        $where['name|id'] = ['=',$city];
+        $city = model('Region')->where($where)->find();
         $district = input('param.district/s','');
         $scenicAreaID = input('param.scenic_area_id/d',0);
         $filtrateIDs = input('param.filtrate_ids/a',[]);
@@ -144,8 +148,9 @@ class Hotel
         (new PagingParameter())->goCheck();
         (new City())->goCheck();
 
-        $where = ['level_type' => 2,'name' => $city];
-        $city = Region::where($where)->find();
+        $where['level_type'] = ['=',2];
+        $where['name|id'] = ['=',$city];
+        $city = model('Region')->where($where)->find();
 
         $district = input('param.district/s','');
         $scenicAreaID = input('param.scenic_area_id/d',0);
@@ -175,8 +180,9 @@ class Hotel
         (new PagingParameter())->goCheck();
         (new City())->goCheck();
 
-        $where = ['level_type' => 2,'name' => $city];
-        $city = Region::where($where)->find();
+        $where['level_type'] = ['=',2];
+        $where['name|id'] = ['=',$city];
+        $city = model('Region')->where($where)->find();
 
         $district = input('param.district/s','');
         $scenicAreaID = input('param.scenic_area_id/d',0);

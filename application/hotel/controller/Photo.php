@@ -65,14 +65,17 @@ class Photo extends BaseController
             if (!$postData['image']) {
                 throw new HotelAdminException(['msg' => '请上传图片']);
             }
-            $imageModel = new Image();
-            $imageModel->url = $postData['image'];
-            $imageModel->save();
-            $model = new HotelImg();
-            $model->hotel_id = $admin['hotel_id'];
-            $model->hotel_img_category_id = $postData['category_id'];
-            $model->img_id = $imageModel->id;
-            $model->save();
+            foreach ($postData['image'] as $value)
+            {
+                $imageModel = new Image();
+                $imageModel->url = $value;
+                $imageModel->save();
+                $model = new HotelImg();
+                $model->hotel_id = $admin['hotel_id'];
+                $model->hotel_img_category_id = $postData['category_id'];
+                $model->img_id = $imageModel->id;
+                $model->save();
+            }
             return json(new SuccessMessage(['msg' => '添加成功']));
         }
         $cate = HotelImgCategory::all();

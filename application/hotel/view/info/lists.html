@@ -37,9 +37,16 @@
                 <td class="gray_bg">起价:</td>
                 <td>{$hotel.min_price}</td>
             </tr>
+            <tr>
+                <td class="gray_bg">营业执照:</td>
+                <td><img src="{$hotel.businessLicense.url}" alt=""></td>
+                <td class="gray_bg"></td>
+                <td></td>
+            </tr>
             </tbody></table>
     </div>
 </fieldset>
+
 {/block}
 {block name="javascript"}
 <script>

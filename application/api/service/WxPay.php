@@ -114,7 +114,7 @@ class WxPay
 
     private function makeWxPreOrder($totalPrice, $orderNo, $type)
     {
-        $totalPrice = 0.01;
+//        $totalPrice = 0.01;
         $wxOrderData = new \WxPayUnifiedOrder();
         $wxOrderData->SetOut_trade_no($orderNo);
         $wxOrderData->SetTrade_type('APP');

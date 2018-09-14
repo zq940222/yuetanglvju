@@ -37,6 +37,12 @@ class Info extends BaseController
                 $imageModel->save();
                 $hotelModel->img_id = $imageModel->id;
             }
+            if ($postData['business_license']) {
+                $imageModel = new Image();
+                $imageModel->url = $postData['business_license'];
+                $imageModel->save();
+                $hotelModel->business_license_img_id = $imageModel->id;
+            }
             $hotelModel->name = $postData['name'];
             $hotelModel->province = $postData['province'];
             $hotelModel->city = $postData['city'];
@@ -68,5 +74,12 @@ class Info extends BaseController
         $this->assign('scenic_area',$scenicArea);
         $this->assign('hotel',$hotelModel);
         return $this->fetch();
+    }
+
+    public function getRegion()
+    {
+        $id = input('post.id');
+        $region = Region::getRegion($id);
+        return $region;
     }
 }

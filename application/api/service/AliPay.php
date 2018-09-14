@@ -127,7 +127,7 @@ class AliPay
     public function makeAliPreOrder($totalAmount, $outTradeNo,$notifyUrl, $subject = '深兰悦棠旅居', $body = '深兰悦棠旅居', $timeoutExpress = '30m', $product_code = 'QUICK_MSECURITY_PAY')
     {
         //测试数据
-        $totalAmount = 0.01;
+//        $totalAmount = 0.01;
         $aop = new \AopClient();
         $aop->gatewayUrl = "https://openapi.alipay.com/gateway.do";
         $aop->appId = "2018070460542343";

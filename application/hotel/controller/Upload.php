@@ -34,7 +34,7 @@ class Upload extends Controller
         $path= ROOT_PATH . 'public' . DS . 'uploads/'.$savename;
         if(file_exists($temp)) {
             $dir=dirname($path);
-            if(!is_dir($dir)) mkdir($dir, 0755, true);
+            if(!is_dir($dir)) mkdir($dir, 0777, true);
             copy($temp, $path);
             unlink($temp);
         }

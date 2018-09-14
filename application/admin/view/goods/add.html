@@ -160,7 +160,7 @@
                 url:'add',
                 type:'post',
                 data:data.field,
-                success:function () {
+                success:function (data) {
                     var code = data.code.toString();
                     var startChar = code.charAt(0);
                     if (startChar == '2')

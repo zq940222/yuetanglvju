@@ -39,7 +39,7 @@ class Hotel
         {
             $where['min_price'] = ['between',[$min_price,$max_price]];
         }else{
-            $where['min_price'] = ['>',$min_price];
+            $where['min_price'] = ['>=',$min_price];
         }
 
         if ($lat && $lon && $max_distance){

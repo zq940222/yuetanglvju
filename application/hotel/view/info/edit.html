@@ -102,6 +102,19 @@
         </div>
 
         <div class="layui-form-item">
+            <label class="layui-form-label">营业执照</label>
+            <div class="layui-input-inline" style="width:80%;">
+                <div class="layui-upload">
+                    <button type="button" class="layui-btn" id="upload1">单图片上传</button>
+                    <div class="layui-upload-list" style="padding-left:110px;">
+                        <img class="layui-upload-img" src="{$hotel.businessLicense.url}" id="showImg1" width="100">
+                        <input type="hidden" name="business_license" id="path1">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
             <div class="layui-input-block">
                 <button class="layui-btn" lay-submit lay-filter="*">立即提交</button>
                 <button type="reset" class="layui-btn layui-btn-primary">重置</button>
@@ -133,6 +146,27 @@
                 }
                 //上传成功
                 $('#path').val(res.data.src); // 将上传后的图片路径赋值给隐藏域
+            }
+        });
+
+        upload.render({
+            elem: '#upload1'
+            ,url: '{:url("upload/upload")}'
+            ,multiple: false
+            ,size: 1024
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#showImg1').attr('src', result); //图片链接（base64）
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败');
+                }
+                //上传成功
+                $('#path1').val(res.data.src); // 将上传后的图片路径赋值给隐藏域
             }
         });
 
