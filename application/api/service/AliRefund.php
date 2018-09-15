@@ -11,7 +11,7 @@ namespace app\api\service;
 use think\Loader;
 
 Loader::import('AliPay.aop.AopClient',EXTEND_PATH,'.php');
-Loader::import('AliPay.aop.request.AlipayTradeAppPayRequest', EXTEND_PATH, '.php');
+Loader::import('AliPay.aop.request.AlipayTradeRefundRequest', EXTEND_PATH, '.php');
 
 class AliRefund
 {

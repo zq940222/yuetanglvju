@@ -26,7 +26,10 @@ class Image extends BaseModel
 
     public function setUrlAttr($value)
     {
-        Upload::move($value);
+        if ($value)
+        {
+            Upload::move($value);
+        }
         return $value;
     }
 
