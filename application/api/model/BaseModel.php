@@ -12,9 +12,12 @@ namespace app\api\model;
 
 
 use think\Model;
+use traits\model\SoftDelete;
 
 class BaseModel extends Model
 {
+    use SoftDelete;
+
     protected $autoWriteTimestamp = true;
 
     protected $deleteTime = 'delete_time';

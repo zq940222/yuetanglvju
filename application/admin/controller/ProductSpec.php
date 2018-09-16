@@ -10,6 +10,7 @@ namespace app\admin\controller;
 
 
 use app\admin\model\Spec;
+use app\admin\model\SpecItem;
 use app\lib\exception\AdminException;
 use app\lib\exception\SuccessMessage;
 
@@ -81,15 +82,20 @@ class ProductSpec extends BaseController
             $typeID = input('post.type_id/d',0);
             $items = input('post.items','');
             $items = explode("\n",$items);
+            $specItems = SpecItem::where('spec_id',$id)->column('item');
+
+            $specItemAdd = array_diff($items,$specItems);
+            $specItmeDelete = array_diff($specItems,$items);
+
             $specItem = [];
-            foreach ($items as $v) {
+            foreach ($specItemAdd as $v) {
                 $specItem[] = ['item'=> $v];
             }
             $productSpec = Spec::get($id);
             $productSpec->name = $name;
             $productSpec->type_id = $typeID;
             $productSpec->save();
-            $productSpec->item()->delete();
+            $productSpec->item()->where('item','in',$specItmeDelete)->delete();
             $productSpec->item()->saveAll($specItem);
             return json(new SuccessMessage(['msg' => '编辑成功']));
         }

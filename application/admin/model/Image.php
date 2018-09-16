@@ -24,13 +24,13 @@ class Image extends BaseModel
         return $this->prefixImgUrl($value,$data);
     }
 
-    public function setUrlAttr($value)
-    {
-        if ($value)
-        {
-            Upload::move($value);
-        }
-        return $value;
-    }
+//    public function setUrlAttr($value)
+//    {
+//        if ($value)
+//        {
+//            Upload::move($value);
+//        }
+//        return $value;
+//    }
 
 }

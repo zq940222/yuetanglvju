@@ -13,9 +13,12 @@ use app\api\service\GoodsLogic;
 use think\Cache;
 use think\Db;
 use think\Request;
+use traits\model\SoftDelete;
 
 class Product extends BaseModel
 {
+    use SoftDelete;
+
     protected $hidden = ['category_id','cover_img_id','is_recommend','status','create_time','update_time','delete_time'];
 
     public function coverImage()

@@ -9,8 +9,12 @@
 namespace app\api\model;
 
 
+use traits\model\SoftDelete;
+
 class Banner extends BaseModel
 {
+    use SoftDelete;
+
     protected $hidden = ['create_time','update_time','delete_time'];
 
     public function items()

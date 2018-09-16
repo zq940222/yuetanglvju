@@ -18,9 +18,9 @@ class SpecProductPrice extends BaseModel
         return config('setting.img_prefix').$value;
     }
 
-    public function setImageAttr($value)
-    {
-        Upload::move($value);
-        return $value;
-    }
+//    public function setImageAttr($value)
+//    {
+//        Upload::move($value);
+//        return $value;
+//    }
 }

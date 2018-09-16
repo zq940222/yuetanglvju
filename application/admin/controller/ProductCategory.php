@@ -79,7 +79,7 @@ class ProductCategory extends BaseController
         $cateModel= new ProductCategoryModel();
         $category = $cateModel->find($id);
         $this->assign('category',$category);
-        $cateList= $cateModel->getCategoryByList();
+        $cateList= $cateModel->where('grade',$category['grade']-1)->select();
         $this->assign('cateList', $cateList);
         return $this->fetch();
     }
