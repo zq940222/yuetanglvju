@@ -95,7 +95,7 @@ class ProductSpec extends BaseController
             $productSpec->name = $name;
             $productSpec->type_id = $typeID;
             $productSpec->save();
-            $productSpec->item()->where('item','in',$specItmeDelete)->delete();
+//            $productSpec->item()->where('item','in',$specItmeDelete)->delete();
             $productSpec->item()->saveAll($specItem);
             return json(new SuccessMessage(['msg' => '编辑成功']));
         }
