@@ -19,7 +19,7 @@ class SpecProductPrice extends BaseModel
         }
         else
         {
-            $product = Product::get($data['product_id']);
+            $product = Product::get($data['product_id'],['coverImage']);
             return $product->coverImage->url;
         }
 

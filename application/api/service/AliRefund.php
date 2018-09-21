@@ -31,12 +31,12 @@ class AliRefund
             "\"out_trade_no\":\"".$outTradeNo."\"," .
 //            "\"trade_no\":\"2014112611001004680073956707\"," .
             "\"refund_amount\":".$totalPrice."," .
-            "\"refund_currency\":\"USD\"," .
+//            "\"refund_currency\":\"USD\"," .
             "\"refund_reason\":\"正常退款\"," .
 //            "\"out_request_no\":\"HZ01RF001\"," .
-//            "\"operator_id\":\"OP001\"," .
-//            "\"store_id\":\"NJ_S_001\"," .
-//            "\"terminal_id\":\"NJ_T_001\"," .
+            "\"operator_id\":\"OP001\"," .
+            "\"store_id\":\"NJ_S_001\"," .
+            "\"terminal_id\":\"NJ_T_001\"," .
 //            "      \"goods_detail\":[{" .
 //            "        \"goods_id\":\"apple-01\"," .
 //            "\"alipay_goods_id\":\"20010001\"," .

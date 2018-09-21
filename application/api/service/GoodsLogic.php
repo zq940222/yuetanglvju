@@ -32,7 +32,9 @@ class GoodsLogic
         $keys = str_replace('_', ',', $keys)[0];
 
         if ($keys) {
-            $filter_spec = Spec::with([
+            $filter_spec = Spec::hasWhere('item',['id'=>['in',$keys]])
+                ->order('id asc')
+                ->with([
                 'item' => function($query) use ($keys){
                     $query->where('id','in',$keys);
                 }

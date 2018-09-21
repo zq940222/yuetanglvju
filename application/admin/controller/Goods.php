@@ -281,9 +281,9 @@ class Goods extends BaseController
      */
     public function ajaxGetSpecSelect(){
         $product_id = input('product_id/d',0);
-        $specList = model('Spec')->where("type_id",input('get.spec_type/d'))->select();
+        $specList = model('Spec')->order('id asc')->where("type_id",input('get.spec_type/d'))->select();
         foreach($specList as $k => $v)
-            $specList[$k]['spec_item'] = model('SpecItem')->where("spec_id",$v['id'])->field('id,item')->select(); // 获取规格项
+            $specList[$k]['spec_item'] = model('SpecItem')->order('id asc')->where("spec_id",$v['id'])->field('id,item')->select(); // 获取规格项
 
         $items_id = model('SpecProductPrice')->where('product_id',$product_id)->column("GROUP_CONCAT(`key` SEPARATOR '_') AS items_id");
         $items_ids = explode('_', $items_id[0]);

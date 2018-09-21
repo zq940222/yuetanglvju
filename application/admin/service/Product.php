@@ -34,7 +34,7 @@ class Product
         $clo_name = array_keys($spec_arr2);
         $spec_arr2 = combineDika($spec_arr2); //  获取 规格的 笛卡尔积
 
-        $spec = model('Spec')->where('id','in',$clo_name)->column('id,name'); // 规格表
+        $spec = model('Spec')->order('id asc')->where('id','in',$clo_name)->column('id,name'); // 规格表
         $specItem = model('SpecItem')->column('id,item,spec_id');//规格项
         $keySpecGoodsPrice = model('SpecProductPrice')->where('product_id','=',$product_id)->column('key,key_name,price,store,image');//规格项
         $str = "<table class='layui-table' id='spec_input_tab'>";
